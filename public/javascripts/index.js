@@ -10,9 +10,9 @@ let NoteObject = function (pName, pType, pAddress, pStar, pURL){
     this.URL= pURL;
 }
 
-NoteArray.push (new NoteObject( "McDonald", "Fast Food", "3239 156th Ave SE, Bellevue, WA 98007", "5 Stars", "https://www.mcdonalds.com/us/en-us.html" ));
-NoteArray.push (new NoteObject( "Rain Cafe", "Cafe", "13200 Aurora Ave N suite c, Seattle, WA 98133", "4 Stars", "https://www.orderraincafe.com/"));
-NoteArray.push (new NoteObject( "El Gran Taco", "Food Truck", "Seattle, WA 98122", "5 Stars", "https://elgrantacoseattle.com/home.php"));
+// NoteArray.push (new NoteObject( "McDonald", "Fast Food", "3239 156th Ave SE, Bellevue, WA 98007", "5 Stars", "https://www.mcdonalds.com/us/en-us.html" ));
+// NoteArray.push (new NoteObject( "Rain Cafe", "Cafe", "13200 Aurora Ave N suite c, Seattle, WA 98133", "4 Stars", "https://www.orderraincafe.com/"));
+// NoteArray.push (new NoteObject( "El Gran Taco", "Food Truck", "Seattle, WA 98122", "5 Stars", "https://elgrantacoseattle.com/home.php"));
 
 
 let selectedType = "not selected";
@@ -55,9 +55,14 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
     $(document).on("pagebeforeshow", "#details", function(event){
+        
         let localID= localStorage.getItem("parm");
+        
+
         NoteArray= JSON.parse(localStorage.getItem("NoteArray"));
+
         let pointer= GetObjectPointer(localID);
+        
         document.getElementById("resturantName").innerHTML= "Name: "+NoteArray[pointer].Name;
         document.getElementById("resturantType").innerHTML= "Type: "+NoteArray[pointer].Type;
         document.getElementById("resturantAddress").innerHTML= "Address: "+NoteArray[pointer].Address;
@@ -70,8 +75,8 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 function GetObjectPointer(whichID){
-    for(i=0;i<NoteArray.length;i++){
-        if(NoteArray[i].ID==whichID){
+    for(i=0; i<NoteArray.length; i++){
+        if(NoteArray[i].ID = whichID){
             return i;
         }
     }
@@ -81,6 +86,12 @@ function GetObjectPointer(whichID){
 function createList(){
     const theTable = document.getElementById('tableID');
     theTable.innerHTML="";
+
+    $.get("/getAllRestaurants", function(data, status){ // AJAX get
+        NoteArray = data; // copy returned server json data into local array
+        // now INSIDE this “call back” anonymous function,
+        // update the web page with this new data
+    
     //add the headings
     //theTable.innerHTML ="<thead><th>ID</th><th>Name</th><th>Type</th><th>Address</th><th>Rating</th></thead>";
     theTable.innerHTML ="<thead><th>ID</th><th>Name</th><th>Type</th></thead>";
@@ -107,6 +118,9 @@ function createList(){
         //newRow.appendChild(tdRating);
         theTable.appendChild(newRow);
     }
+
+
+
     //add row click event handlers
     var table = document.getElementById("tableID");
     var rows = table.getElementsByTagName("tr");
@@ -116,18 +130,24 @@ function createList(){
             function(row)
             {
                 return function() {
+                    
+                    
                     //var cell = row.getElementsByTagName("td")[0];
                     //var whichID = cell.innerHTML;
                     //openWebsite(whichID);
                     var parm=this.getAttribute("data-parm");
                     localStorage.setItem('parm',parm);
-                    let stringMovieArray = JSON.stringify(NoteArray);
-                    localStorage.setItem('NoteArray', stringMovieArray);
+
+                    let stringRestaurantArray = JSON.stringify(NoteArray);
+                    localStorage.setItem('NoteArray', stringRestaurantArray);
                     document.location.href="index.html#details";
+                    
                 };
             };
         currentRow.onclick = createClickHandler(currentRow);
-    }
+    };
+});
+   
 };
 function openWebsite(which){
     for(let i = 0; i < NoteArray.length; i++){
